@@ -1,0 +1,10 @@
+main: me.ikevoodoo.helix.BukkitHelixProvider
+name: "Helix"
+description: "A plugin loader which adds extra features on top of Spigot"
+version: '${version}'
+api-version: 1.17
+author: IkeVoodoo
+website: "https://refinedtech.dev/discord"
+
+softdepend:
+  - MinehutPlugin # Used for paper warnings

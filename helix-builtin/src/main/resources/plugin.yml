@@ -1,0 +1,5 @@
+name: helix-builtins
+version: '${version}'
+main: me.ikevoodoo.helix.builtin.HelixBuiltins
+api-version: 1.17
+description: "Provides user-facing functionality for helix."
