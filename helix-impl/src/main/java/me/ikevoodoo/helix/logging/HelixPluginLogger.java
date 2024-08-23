@@ -158,20 +158,27 @@ public final class HelixPluginLogger extends HelixLogger {
     }
 
     public void error0(Object object, Object... args) {
-        ERROR.print(LoggerColoring.replaceColoring(processMessage(LoggerLevel.ERROR, object).formatted(args)));
+        ERROR.print(processMessageAndColor(LoggerLevel.ERROR, object).formatted(args));
         eprintln0();
     }
 
     public void error0(Throwable throwable) {
-        ERROR.print(LoggerColoring.replaceColoring(processMessage(LoggerLevel.ERROR, throwable.getMessage())));
+        ERROR.print(processMessageAndColor(LoggerLevel.ERROR, throwable.getMessage()));
         throwable.printStackTrace(ERROR);
 
         eprintln0();
     }
 
     @Override
+    public void errorWithSuppressed0(Throwable throwable) {
+        this.error0(throwable);
+
+        this.printSuppressed(throwable, 0);
+    }
+
+    @Override
     public void reportError0(Object object, Object... args) {
-        var msg = LoggerColoring.replaceColoring(processMessage(LoggerLevel.ERROR, object).formatted(args));
+        var msg = processMessageAndColor(LoggerLevel.ERROR, object).formatted(args);
         ERROR.print(msg);
         eprintln0();
 
@@ -180,7 +187,7 @@ public final class HelixPluginLogger extends HelixLogger {
 
     @Override
     public void reportError0(Throwable throwable) {
-        var msg = LoggerColoring.replaceColoring(processMessage(LoggerLevel.ERROR, throwable.getMessage()));
+        var msg = processMessageAndColor(LoggerLevel.ERROR, throwable.getMessage());
         ERROR.print(msg);
         throwable.printStackTrace(ERROR);
         eprintln0();
@@ -188,12 +195,39 @@ public final class HelixPluginLogger extends HelixLogger {
         Helix.errors().reportError(msg, ErrorType.ERROR);
     }
 
-    private static String processMessage(LoggerLevel level, Object object) {
+    private String processMessageAndColor(LoggerLevel level, Object object) {
+        return LoggerColoring.replaceColoring(level.getConsoleText() + object);
+    }
+
+    private String processMessage(LoggerLevel level, Object object) {
         return level.getConsoleText() + object;
     }
 
     private static PrintStream newPrintStream(FileDescriptor fileDescriptor) {
         return newPrintStream(new FileOutputStream(fileDescriptor), System.getProperties().getProperty("sun.stdout.encoding"));
+    }
+
+    private void printSuppressed(Throwable throwable, int indent) {
+        var space = "   ".repeat(indent) + " - ";
+
+        this.printSuppressedLine(space, throwable);
+
+        for (var suppressed : throwable.getSuppressed()) {
+            if (suppressed.getSuppressed().length > 0) {
+                this.printSuppressed(suppressed, indent + 1);
+                continue;
+            }
+
+            this.printSuppressedLine(space, suppressed);
+        }
+    }
+
+    private void printSuppressedLine(String space, Throwable throwable) {
+        var trace = throwable.fillInStackTrace().getStackTrace();
+        var file = trace.length == 0 ? "Unknown" : trace[trace.length - 1].getClassName();
+        var line = trace.length == 0 ? "-1" : trace[trace.length - 1].getLineNumber();
+
+        this.error0("%s%s [%s:%s]", space, throwable.getMessage(), file, line);
     }
 
     /**

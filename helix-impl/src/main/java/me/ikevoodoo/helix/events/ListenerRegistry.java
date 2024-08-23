@@ -3,6 +3,7 @@ package me.ikevoodoo.helix.events;
 import me.ikevoodoo.helix.api.Helix;
 import me.ikevoodoo.helix.api.events.HelixEventRegistry;
 import me.ikevoodoo.helix.api.events.annotations.CaptureChildEvents;
+import me.ikevoodoo.helix.api.logging.HelixLogger;
 import me.ikevoodoo.helix.api.plugins.HelixPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -129,8 +130,9 @@ public final class ListenerRegistry implements HelixEventRegistry {
             } catch (IllegalAccessException | InvocationTargetException e) {
                 var bukkitPlugin = this.plugin.getBukkitPlugin();
 
-                bukkitPlugin.getLogger().log(Level.SEVERE, e, () -> "Error while handling %s in helix plugin %s"
-                        .formatted(unwrappedEvent.getClass().getName(), bukkitPlugin.getDescription().getFullName()));
+                HelixLogger.error("Hey! There was an error while executing listener '%s' (from plugin '%s'), important details:",
+                        unwrappedEvent.getClass().getName(), bukkitPlugin.getDescription().getFullName());
+                HelixLogger.errorWithSuppressed(e);
             }
         }
 

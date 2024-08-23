@@ -55,6 +55,8 @@ public abstract class HelixLogger {
     public abstract void error0(Object object, Object... args);
     public abstract void error0(Throwable throwable);
 
+    public abstract void errorWithSuppressed0(Throwable throwable);
+
     public abstract void reportError0(Object object, Object... args);
     public abstract void reportError0(Throwable throwable);
 
@@ -160,6 +162,10 @@ public abstract class HelixLogger {
 
     public static void error(Throwable throwable) {
         logger.error0(throwable);
+    }
+
+    public static void errorWithSuppressed(Throwable throwable) {
+        logger.errorWithSuppressed0(throwable);
     }
 
     public static void reportError(Object object, Object... args) {
