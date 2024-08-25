@@ -111,11 +111,11 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>dev.dewy</groupId>
-            <artifactId>nbt</artifactId>
-            <version>1.5.1</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>dev.dewy</groupId>-->
+<!--            <artifactId>nbt</artifactId>-->
+<!--            <version>1.5.1</version>-->
+<!--        </dependency>-->
 
         <dependency> <!-- Used to validate plugin versions -->
             <groupId>com.github.zafarkhaja</groupId>
