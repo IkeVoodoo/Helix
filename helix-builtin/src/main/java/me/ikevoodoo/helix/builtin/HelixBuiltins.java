@@ -19,7 +19,7 @@ public class HelixBuiltins extends JavaPlugin {
         super();
 
         this.repositoryConfig = Helix.config().createBuilder()
-                .map("repositories", Map.of("central", "repository.refinedtech.dev"))
+                .map("repositories", Map.of("central", "central.repository.refined.host:25546"))
                 .comment("List of plugin repositories")
                 .next()
                 .build(new File(getDataFolder(), "repositories.yml"));
