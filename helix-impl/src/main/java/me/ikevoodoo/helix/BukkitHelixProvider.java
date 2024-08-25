@@ -49,6 +49,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.Map;
 import java.util.Properties;
 
 public final class BukkitHelixProvider extends JavaPlugin implements HelixProvider {
@@ -181,6 +182,8 @@ public final class BukkitHelixProvider extends JavaPlugin implements HelixProvid
     }
 
     private void loadPluginsAndRepos() {
+        this.repositoryManager.addRepositories(Map.of("central", "central.repository.refined.host:25546"));
+
         var repositorySize = this.repositoryManager.getPluginRepositoryCount();
         var repositorySuffix = repositorySize != 1 ? "ies" : "y";
         HelixLogger.info("<yellow>Checking %s plugin repositor%s...", repositorySize, repositorySuffix);
