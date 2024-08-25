@@ -15,6 +15,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class BukkitHelixScheduler implements HelixScheduler {
+
+    // TODO post-release improve this class... significantly...
+
     @Override
     public void sync(Runnable runnable) {
         Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(BukkitHelixProvider.class), runnable);
@@ -42,7 +45,15 @@ public class BukkitHelixScheduler implements HelixScheduler {
     public void timer(Runnable runnable, long period, TimeUnit unit) {
         var ticks = unit.toSeconds(period) * 20L;
 
-        Bukkit.getScheduler().runTaskTimer(JavaPlugin.getPlugin(BukkitHelixProvider.class), runnable, ticks, ticks);
+        Bukkit.getScheduler().runTaskTimer(JavaPlugin.getPlugin(BukkitHelixProvider.class), task -> {
+            try {
+                runnable.run();
+            } catch (IllegalStateException e) {
+                if (e.getMessage().equals("zip file closed")) {
+                    task.cancel(); // TEMPORARY FIX UNTIL THE SCHEDULER IS IMPROVED!
+                }
+            }
+        }, ticks, ticks);
     }
 
     @Override
@@ -75,6 +86,10 @@ public class BukkitHelixScheduler implements HelixScheduler {
                     futureRef.set(new CompletableFuture<>());
                     return;
                 }
+            } catch (IllegalStateException e) {
+                if (e.getMessage().equals("zip file closed")) {
+                    task.cancel(); // TEMPORARY FIX UNTIL THE SCHEDULER IS IMPROVED!
+                }
             } catch (Exception e) {
                 HelixLogger.reportError(e);
             }
@@ -90,7 +105,15 @@ public class BukkitHelixScheduler implements HelixScheduler {
     public void asyncTimer(Runnable runnable, long period, TimeUnit unit) {
         var ticks = unit.toSeconds(period) * 20L;
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(JavaPlugin.getPlugin(BukkitHelixProvider.class), runnable, ticks, ticks);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(JavaPlugin.getPlugin(BukkitHelixProvider.class), task -> {
+            try {
+                runnable.run();
+            } catch (IllegalStateException e) {
+                if (e.getMessage().equals("zip file closed")) {
+                    task.cancel(); // TEMPORARY FIX UNTIL THE SCHEDULER IS IMPROVED!
+                }
+            }
+        }, ticks, ticks);
     }
 
     @Override
@@ -119,6 +142,10 @@ public class BukkitHelixScheduler implements HelixScheduler {
                     future.complete(res);
                     futureRef.set(new CompletableFuture<>());
                     return;
+                }
+            } catch (IllegalStateException e) {
+                if (e.getMessage().equals("zip file closed")) {
+                    task.cancel(); // TEMPORARY FIX UNTIL THE SCHEDULER IS IMPROVED!
                 }
             } catch (Exception e) {
                 HelixLogger.reportError(e);
@@ -156,7 +183,15 @@ public class BukkitHelixScheduler implements HelixScheduler {
     public void syncLater(Runnable runnable, long delay, TimeUnit unit) {
         var ticks = unit.toSeconds(delay) * 20L;
 
-        Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(BukkitHelixProvider.class), runnable, ticks);
+        Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(BukkitHelixProvider.class), task -> {
+            try {
+                runnable.run();
+            } catch (IllegalStateException e) {
+                if (e.getMessage().equals("zip file closed")) {
+                    task.cancel(); // TEMPORARY FIX UNTIL THE SCHEDULER IS IMPROVED!
+                }
+            }
+        }, ticks);
     }
 
     @Override
@@ -164,9 +199,13 @@ public class BukkitHelixScheduler implements HelixScheduler {
         var future = new CompletableFuture<T>();
         var ticks = unit.toSeconds(delay) * 20L;
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(JavaPlugin.getPlugin(BukkitHelixProvider.class), () -> {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(JavaPlugin.getPlugin(BukkitHelixProvider.class), task -> {
             try {
                 future.complete(supplier.call());
+            } catch (IllegalStateException e) {
+                if (e.getMessage().equals("zip file closed")) {
+                    task.cancel(); // TEMPORARY FIX UNTIL THE SCHEDULER IS IMPROVED!
+                }
             } catch (Exception e) {
                 HelixLogger.reportError(e);
             }
