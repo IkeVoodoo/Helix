@@ -121,11 +121,13 @@
             <groupId>com.github.zafarkhaja</groupId>
             <artifactId>java-semver</artifactId>
             <version>${lib.semver.ver}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency> <!-- Used to parse repository responses -->
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${lib.gson.ver}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency> <!-- Command Dependency -->
@@ -138,6 +140,7 @@
             <groupId>info.debatty</groupId>
             <artifactId>java-string-similarity</artifactId>
             <version>2.0.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Compile only dependencies -->

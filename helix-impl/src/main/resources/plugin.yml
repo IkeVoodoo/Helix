@@ -6,5 +6,7 @@ api-version: 1.17
 author: IkeVoodoo
 website: "https://refinedtech.dev/discord"
 
-softdepend:
-  - MinehutPlugin # Used for paper warnings
+libraries:
+  - info.debatty:java-string-similarity:2.0.0
+  - com.google.code.gson:gson:${lib.gson.ver}
+  - com.github.zafarkhaja:java-semver:${lib.semver.ver}
