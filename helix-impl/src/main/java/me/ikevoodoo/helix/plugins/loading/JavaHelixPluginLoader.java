@@ -20,10 +20,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
@@ -32,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.jar.JarFile;
+import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
 public class JavaHelixPluginLoader implements HelixPluginLoader {
@@ -120,36 +124,57 @@ public class JavaHelixPluginLoader implements HelixPluginLoader {
     }
 
     private boolean loadMetadata(PluginMetadata metadata, File file) {
-        try(var jarFile = new JarFile(file);
-            var stream = jarFile.getInputStream(new ZipEntry("download.info"))) {
-            if (stream == null) {
-                HelixLogger.reportError("No download info found in plugin '%s'!", file.getName());
+        load:
+        {
+            var downloadEntry = new ZipEntry("download.info");
+            try (var jarFile = new JarFile(file);
+                 var stream = jarFile.getInputStream(downloadEntry)) {
+                if (stream == null) {
+                    HelixLogger.reportError("No download info found in plugin '%s'!", file.getName());
+
+                    jarFile.close();
+
+                    try (var outputStream = new JarOutputStream(new FileOutputStream(file))) {
+                        outputStream.putNextEntry(downloadEntry);
+                        outputStream.write("""
+                                entry: %s
+                                version: %s
+                                """.formatted(metadata.id(), metadata.version().toString()).getBytes(StandardCharsets.UTF_8));
+                    }
+
+                    break load;
+                }
+
+                return loadEntry(metadata, file, stream);
+            } catch (IOException exception) {
+                HelixLogger.reportError("Unable to load plugin '%s' as it has no metadata!");
+                return false;
+            }
+        }
+
+        return loadMetadata(metadata, file); // This way we also ensure closing every resource
+    }
+
+    private boolean loadEntry(PluginMetadata metadata, File file, InputStream stream) throws IOException {
+        var text = new String(stream.readAllBytes());
+
+        var entries = text.split("\n");
+
+        for(var entry : entries) {
+            var splitIndex = entry.indexOf(": ");
+            if (splitIndex == -1) {
+                HelixLogger.reportError("Invalid info entry '%s' in '%s'!", entry, file.getName());
                 return false;
             }
 
-            var text = new String(stream.readAllBytes());
+            var key = entry.substring(0, splitIndex).toLowerCase(Locale.ROOT);
+            var value = entry.substring(splitIndex + 2);
 
-            var entries = text.split("\n");
-
-            for(var entry : entries) {
-                var splitIndex = entry.indexOf(": ");
-                if (splitIndex == -1) {
-                    HelixLogger.reportError("Invalid info entry '%s' in '%s'!", entry, file.getName());
-                    return false;
-                }
-
-                var key = entry.substring(0, splitIndex).toLowerCase(Locale.ROOT);
-                var value = entry.substring(splitIndex + 2);
-
-                switch (key) {
-                    case "repository" -> metadata.setOriginRepository(value);
-                    case "entry" -> metadata.setId(value);
-                    case "version" -> metadata.setVersion(Version.tryParse(value).orElse(null));
-                }
+            switch (key) {
+                case "repository" -> metadata.setOriginRepository(value);
+                case "entry" -> metadata.setId(value);
+                case "version" -> metadata.setVersion(Version.tryParse(value).orElse(null));
             }
-        } catch (IOException exception) {
-            HelixLogger.reportError("Unable to load plugin '%s' as it has no metadata!");
-            return false;
         }
 
         return true;

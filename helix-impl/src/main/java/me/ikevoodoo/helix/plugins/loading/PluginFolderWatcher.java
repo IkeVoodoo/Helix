@@ -1,10 +1,12 @@
 package me.ikevoodoo.helix.plugins.loading;
 
 import me.ikevoodoo.helix.api.helper.FileHelper;
+import me.ikevoodoo.helix.api.logging.HelixLogger;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
@@ -17,7 +19,17 @@ public class PluginFolderWatcher extends Thread {
     private boolean running;
 
     public PluginFolderWatcher(File pluginFolder, Runnable fileChangedCallback) {
-        this.pluginFolder = pluginFolder.toPath();
+        this.pluginFolder = pluginFolder.getAbsoluteFile().toPath();
+        if(!Files.exists(this.pluginFolder)) {
+            try {
+                Files.createDirectories(this.pluginFolder);
+            } catch (IOException e) {
+                HelixLogger.reportError(e);
+                throw new RuntimeException(e);
+            }
+        }
+
+
         this.fileChangedCallback = fileChangedCallback;
     }
 

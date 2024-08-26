@@ -18,7 +18,15 @@ public final class VersionUtils {
 
     public static Version getMinecraftVersionSemver() {
         if(VersionUtils.minecraftVersionSemver == null) {
-            VersionUtils.minecraftVersionSemver = Version.parse(getMinecraftVersion());
+            var mcVer = getMinecraftVersion();
+
+            var hasNoThird = mcVer.split("\\.").length == 2;
+
+            if (hasNoThird) {
+                mcVer += ".0";
+            }
+
+            VersionUtils.minecraftVersionSemver = Version.parse(mcVer);
         }
 
         return VersionUtils.minecraftVersionSemver;
