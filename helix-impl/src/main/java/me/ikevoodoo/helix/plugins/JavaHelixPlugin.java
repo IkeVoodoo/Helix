@@ -1,8 +1,8 @@
 package me.ikevoodoo.helix.plugins;
 
-import com.github.zafarkhaja.semver.Version;
 import me.ikevoodoo.helix.api.Helix;
 import me.ikevoodoo.helix.api.plugins.HelixPlugin;
+import me.ikevoodoo.helix.api.semver.Version;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;

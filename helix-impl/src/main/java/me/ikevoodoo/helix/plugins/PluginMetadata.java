@@ -1,6 +1,6 @@
 package me.ikevoodoo.helix.plugins;
 
-import com.github.zafarkhaja.semver.Version;
+import me.ikevoodoo.helix.api.semver.Version;
 
 import java.util.Objects;
 

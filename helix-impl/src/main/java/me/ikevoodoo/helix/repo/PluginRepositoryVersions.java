@@ -1,9 +1,7 @@
 package me.ikevoodoo.helix.repo;
 
-import com.github.zafarkhaja.semver.Parser;
-import com.github.zafarkhaja.semver.Version;
-import com.github.zafarkhaja.semver.expr.Expression;
-import com.github.zafarkhaja.semver.expr.ExpressionParser;
+import me.ikevoodoo.helix.api.semver.Version;
+import me.ikevoodoo.helix.api.semver.VersionExpression;
 import me.ikevoodoo.helix.utils.VersionUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,8 +11,7 @@ import java.util.TreeMap;
 
 public final class PluginRepositoryVersions {
 
-    private static final Parser<Expression> EXPRESSION_PARSER = ExpressionParser.newInstance();
-    private final @NotNull Map<Version, Expression> supportedVersions;
+    private final @NotNull Map<Version, VersionExpression> supportedVersions;
 
     public PluginRepositoryVersions(Map<String, String> versionMap) {
         this.supportedVersions = createVersionMap(versionMap);
@@ -30,8 +27,8 @@ public final class PluginRepositoryVersions {
         return null;
     }
 
-    private static Map<Version, Expression> createVersionMap(Map<String, String> versionMap) {
-        var versions = new TreeMap<Version, Expression>((o1, o2) -> -o1.compareTo(o2));
+    private static Map<Version, VersionExpression> createVersionMap(Map<String, String> versionMap) {
+        var versions = new TreeMap<Version, VersionExpression>((o1, o2) -> -o1.compareTo(o2));
 
         var current = VersionUtils.getMinecraftVersionSemver();
 
@@ -39,20 +36,23 @@ public final class PluginRepositoryVersions {
             var key = entry.getKey();
             var value = entry.getValue();
 
-            synchronized (EXPRESSION_PARSER) {
-                var check = EXPRESSION_PARSER.parse(value);
-                if (!current.satisfies(check)) {
-                    continue;
-                }
-
-                versions.put(Version.parse(key), new PluginRepositoryVersionExpression(check, value));
+            var check = VersionExpression.parse(value);
+            if (check == null) {
+                continue;
             }
+
+            if (!current.satisfies(check)) {
+                continue;
+            }
+
+            versions.put(Version.parse(key), check);
+
         }
 
         return versions;
     }
 
-    public @NotNull Map<Version, Expression> supportedVersions() {
+    public @NotNull Map<Version, VersionExpression> supportedVersions() {
         return supportedVersions;
     }
 

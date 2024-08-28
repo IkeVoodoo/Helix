@@ -1,14 +1,13 @@
 package me.ikevoodoo.helix.repo;
 
-import com.github.zafarkhaja.semver.Version;
 import com.google.gson.JsonObject;
+import me.ikevoodoo.helix.api.semver.Version;
 import me.ikevoodoo.helix.utils.JsonUtils;
 import me.ikevoodoo.helix.utils.VersionUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 

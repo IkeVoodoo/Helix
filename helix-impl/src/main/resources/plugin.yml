@@ -9,4 +9,3 @@ website: "https://refinedtech.dev/discord"
 libraries:
   - info.debatty:java-string-similarity:2.0.0
   - com.google.code.gson:gson:${lib.gson.ver}
-  - com.github.zafarkhaja:java-semver:${lib.semver.ver}

@@ -1,6 +1,5 @@
 package me.ikevoodoo.helix;
 
-import com.github.zafarkhaja.semver.Version;
 import me.ikevoodoo.helix.api.Helix;
 import me.ikevoodoo.helix.api.HelixProvider;
 import me.ikevoodoo.helix.api.commands.HelixCommandRegistry;
@@ -16,6 +15,7 @@ import me.ikevoodoo.helix.api.plugins.loading.HelixPluginLoader;
 import me.ikevoodoo.helix.api.reporting.ErrorType;
 import me.ikevoodoo.helix.api.scheduling.HelixScheduler;
 import me.ikevoodoo.helix.api.screens.HelixScreenRegistry;
+import me.ikevoodoo.helix.api.semver.Version;
 import me.ikevoodoo.helix.api.tags.HelixTagManager;
 import me.ikevoodoo.helix.api.words.HelixWorldManager;
 import me.ikevoodoo.helix.commands.JavaHelixCommandRegistry;

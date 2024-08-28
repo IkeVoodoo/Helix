@@ -1,6 +1,6 @@
 package me.ikevoodoo.helix.utils;
 
-import com.github.zafarkhaja.semver.Version;
+import me.ikevoodoo.helix.api.semver.Version;
 import org.bukkit.Bukkit;
 
 public final class VersionUtils {

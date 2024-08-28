@@ -117,12 +117,6 @@
 <!--            <version>1.5.1</version>-->
 <!--        </dependency>-->
 
-        <dependency> <!-- Used to validate plugin versions -->
-            <groupId>com.github.zafarkhaja</groupId>
-            <artifactId>java-semver</artifactId>
-            <version>${lib.semver.ver}</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency> <!-- Used to parse repository responses -->
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>

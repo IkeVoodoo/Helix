@@ -1,12 +1,12 @@
 package me.ikevoodoo.helix.plugins.loading;
 
-import com.github.zafarkhaja.semver.Version;
 import me.ikevoodoo.helix.BukkitHelixProvider;
 import me.ikevoodoo.helix.api.Helix;
 import me.ikevoodoo.helix.api.logging.HelixLogger;
 import me.ikevoodoo.helix.api.namespaced.UniqueIdentifier;
 import me.ikevoodoo.helix.api.plugins.HelixPlugin;
 import me.ikevoodoo.helix.api.plugins.loading.HelixPluginLoader;
+import me.ikevoodoo.helix.api.semver.Version;
 import me.ikevoodoo.helix.plugins.JavaHelixPlugin;
 import me.ikevoodoo.helix.plugins.PluginMetadata;
 import me.ikevoodoo.helix.screens.HelixScreenRegistryImpl;
@@ -173,7 +173,7 @@ public class JavaHelixPluginLoader implements HelixPluginLoader {
             switch (key) {
                 case "repository" -> metadata.setOriginRepository(value);
                 case "entry" -> metadata.setId(value);
-                case "version" -> metadata.setVersion(Version.tryParse(value).orElse(null));
+                case "version" -> metadata.setVersion(Version.parse(value));
             }
         }
 
