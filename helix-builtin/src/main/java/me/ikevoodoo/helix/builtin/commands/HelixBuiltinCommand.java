@@ -26,7 +26,6 @@ import me.ikevoodoo.helix.builtin.commands.repo.update.RepoUpdateCommand;
 import me.ikevoodoo.helix.commands.parsers.RepositoryArgumentParser;
 import me.ikevoodoo.helix.logging.LoggerColoring;
 import me.ikevoodoo.helix.plugins.JavaHelixPlugin;
-import me.ikevoodoo.helix.repo.PluginRepositoryVersionExpression;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -756,8 +755,7 @@ public class HelixBuiltinCommand extends HelixCommand {
 
 
                         var latestSupported = resource.versions().supportedVersions().get(ver);
-                        var supportedString = latestSupported instanceof PluginRepositoryVersionExpression expr ? expr.getExpressionString() : "unknown";
-                        player.sendMessage("§7Supports versions: §f%s §8(%s§8)".formatted(supportedString, supportedMessage));
+                        player.sendMessage("§7Supports versions: §f%s §8(%s§8)".formatted(latestSupported, supportedMessage));
                         player.sendMessage(resource.description());
                     } catch (IOException e) {
                         player.sendMessage("§cUnable to get info for resource '§f%s§c'.".formatted(resourceId));

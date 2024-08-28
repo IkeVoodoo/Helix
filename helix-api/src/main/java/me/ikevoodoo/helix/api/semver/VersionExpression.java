@@ -9,13 +9,19 @@ public record VersionExpression(VersionCompareOperator operator, Version version
         var pattern = VersionCompareOperator.getMatchPattern();
 
         var matcher = pattern.matcher(trimmed);
+
+        String versionOperatorString;
+        int substringOffset;
         if (!matcher.find()) {
-            throw new IllegalArgumentException("Invalid expression: " + expression);
+            versionOperatorString = VersionCompareOperator.EQUAL.getOperator();
+            substringOffset = 0;
+        } else {
+            versionOperatorString = matcher.group(1);
+            substringOffset = matcher.end(1);
         }
 
-        var versionOperatorString = matcher.group(1);
         var versionOperator = VersionCompareOperator.fromString(versionOperatorString);
-        var versionString = trimmed.substring(matcher.end(1));
+        var versionString = trimmed.substring(substringOffset);
         var version = Version.parse(versionString);
 
         return new VersionExpression(versionOperator, version);

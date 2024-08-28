@@ -1,8 +1,9 @@
 package me.ikevoodoo.helix.builtin.updates.check;
 
-import com.github.zafarkhaja.semver.Version;
 import me.ikevoodoo.helix.BukkitHelixProvider;
 import me.ikevoodoo.helix.api.Helix;
+import me.ikevoodoo.helix.api.semver.Version;
+import me.ikevoodoo.helix.api.semver.VersionCompareOperator;
 import me.ikevoodoo.helix.api.types.Some;
 import me.ikevoodoo.helix.api.types.Tuple;
 import me.ikevoodoo.helix.builtin.commands.repo.update.utils.EntryUpdateData;
@@ -78,7 +79,7 @@ public class UpdateRetriever {
 
             var highestSupported = latest.highestSupportedVersion();
 
-            if (highestSupported != null && highestSupported.isHigherThan(version)) {
+            if (highestSupported != null && VersionCompareOperator.GREATER_THAN.compare(highestSupported, version)) {
                 return Some.value(new EntryUpdateData(
                         key,
                         repo.getId(),

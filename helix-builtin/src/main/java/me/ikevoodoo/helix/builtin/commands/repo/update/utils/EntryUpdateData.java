@@ -1,6 +1,6 @@
 package me.ikevoodoo.helix.builtin.commands.repo.update.utils;
 
-import com.github.zafarkhaja.semver.Version;
+import me.ikevoodoo.helix.api.semver.Version;
 
 public record EntryUpdateData(
         String pluginId,

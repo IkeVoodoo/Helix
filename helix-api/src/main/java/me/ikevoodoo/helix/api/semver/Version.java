@@ -4,11 +4,17 @@ import org.jetbrains.annotations.NotNull;
 
 public record Version(int major, int minor, int patch) implements Comparable<Version> {
 
+    public static Version of(int major, int minor, int patch) {
+        return new Version(major, minor, patch);
+    }
+
     public static Version parse(String version) {
         var trimmed  = version.trim();
         if (trimmed.isEmpty()) return null;
 
-        var split = trimmed.split("\\.");
+        var finalVersion = trimmed.chars().filter(ch -> ch >= '0' && ch <= '9').collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
+
+        var split = finalVersion.split("\\.");
 
         var major = split.length > 0 ? Integer.parseInt(split[0]) : 0;
         var minor = split.length > 1 ? Integer.parseInt(split[1]) : 0;

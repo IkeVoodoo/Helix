@@ -36,6 +36,7 @@ public final class PluginRepositoryVersions {
             var key = entry.getKey();
             var value = entry.getValue();
 
+
             var check = VersionExpression.parse(value);
             if (check == null) {
                 continue;
