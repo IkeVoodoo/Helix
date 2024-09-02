@@ -38,6 +38,9 @@ import me.ikevoodoo.helix.scheduling.BukkitHelixScheduler;
 import me.ikevoodoo.helix.screens.HelixScreenRegistryImpl;
 import me.ikevoodoo.helix.tags.BukkitHelixTagManager;
 import me.ikevoodoo.helix.worlds.BukkitHelixWorldManager;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.InvalidDescriptionException;
+import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -50,6 +53,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Properties;
+import java.util.logging.Level;
 
 public final class BukkitHelixProvider extends JavaPlugin implements HelixProvider {
 
@@ -140,6 +144,12 @@ public final class BukkitHelixProvider extends JavaPlugin implements HelixProvid
 
         this.helixPluginLoader.shutdown();
 
+        try {
+            this.errorReporter.dumpErrors(new File(getDataFolder(), "errors"));
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Unable to save errors", e);
+        }
+
         this.errorReporter.endSession();
     }
 
@@ -154,6 +164,8 @@ public final class BukkitHelixProvider extends JavaPlugin implements HelixProvid
     // FIXME remove this shit wtf is this shit
     public void movePlugin(Plugin plugin) {
         try {
+            Bukkit.getPluginManager().disablePlugin(plugin);
+
             var file = new File(plugin.getClass()
                     .getProtectionDomain()
                     .getCodeSource()
@@ -165,7 +177,11 @@ public final class BukkitHelixProvider extends JavaPlugin implements HelixProvid
 
             var dir = this.helixPluginLoader.getPluginFolder();
             Files.move(file.toPath(), dir.toPath().resolve(file.getName()), StandardCopyOption.REPLACE_EXISTING);
-        } catch (URISyntaxException | IOException e) {
+
+            if (this.errorReporter.getSession() != null) {
+                this.helixPluginLoader.load(dir.toPath().resolve(file.getName()).toFile());
+            }
+        } catch (URISyntaxException | IOException | InvalidDescriptionException | InvalidPluginException e) {
             throw new RuntimeException(e);
         }
     }

@@ -4,6 +4,7 @@ import me.ikevoodoo.helix.api.Helix;
 import me.ikevoodoo.helix.api.logging.LoggerLevel;
 import me.ikevoodoo.helix.api.logging.HelixLogger;
 import me.ikevoodoo.helix.api.reporting.ErrorType;
+import org.bukkit.Bukkit;
 
 import java.io.BufferedOutputStream;
 import java.io.FileDescriptor;
@@ -179,6 +180,7 @@ public final class HelixPluginLogger extends HelixLogger {
     @Override
     public void reportError0(Object object, Object... args) {
         var msg = processMessageAndColor(LoggerLevel.ERROR, object).formatted(args);
+        Bukkit.getLogger().severe(msg);
         ERROR.print(msg);
         eprintln0();
 
