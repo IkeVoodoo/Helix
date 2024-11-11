@@ -39,8 +39,6 @@ import me.ikevoodoo.helix.screens.HelixScreenRegistryImpl;
 import me.ikevoodoo.helix.tags.BukkitHelixTagManager;
 import me.ikevoodoo.helix.worlds.BukkitHelixWorldManager;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.InvalidDescriptionException;
-import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -164,7 +162,7 @@ public final class BukkitHelixProvider extends JavaPlugin implements HelixProvid
     // FIXME remove this shit wtf is this shit
     public void movePlugin(Plugin plugin) {
         try {
-            Bukkit.getPluginManager().disablePlugin(plugin);
+            final var name = plugin.getDescription().getName();
 
             var file = new File(plugin.getClass()
                     .getProtectionDomain()
@@ -178,10 +176,15 @@ public final class BukkitHelixProvider extends JavaPlugin implements HelixProvid
             var dir = this.helixPluginLoader.getPluginFolder();
             Files.move(file.toPath(), dir.toPath().resolve(file.getName()), StandardCopyOption.REPLACE_EXISTING);
 
-            if (this.errorReporter.getSession() != null) {
-                this.helixPluginLoader.load(dir.toPath().resolve(file.getName()).toFile());
-            }
-        } catch (URISyntaxException | IOException | InvalidDescriptionException | InvalidPluginException e) {
+            Files.deleteIfExists(file.toPath());
+
+            HelixLogger.warning("Plugin '%s' has requested a move from the standard plugins directory to the helix plugin directory.", name);
+            HelixLogger.warning("The plugin has been moved, and the server will now shutdown.");
+            HelixLogger.warning("If this message keeps repeating, please go into your plugins folder, and move:");
+            HelixLogger.warning("The file '%s' to 'helix/plugins/%s'", file.getName(), file.getName());
+
+            Bukkit.shutdown();
+        } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         }
     }
