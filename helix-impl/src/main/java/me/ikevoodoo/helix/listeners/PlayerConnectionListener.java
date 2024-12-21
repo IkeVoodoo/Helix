@@ -4,6 +4,7 @@ import me.ikevoodoo.helix.api.Helix;
 import me.ikevoodoo.helix.api.tags.behaviors.TagBehaviors;
 import me.ikevoodoo.helix.api.tags.behaviors.join.JoinTagContext;
 import me.ikevoodoo.helix.api.tags.behaviors.join.async.AsyncJoinTagContext;
+import me.ikevoodoo.helix.api.tags.behaviors.quit.QuitTagContext;
 import me.ikevoodoo.helix.events.ListenerRegistry;
 import me.ikevoodoo.helix.events.wrappers.PlayerJoinWrapperEvent;
 import org.bukkit.event.EventHandler;
@@ -46,5 +47,7 @@ public class PlayerConnectionListener implements Listener {
 
         var listenerRegistry = (ListenerRegistry) Helix.events();
         listenerRegistry.broadcast(join);
+
+        Helix.tags().fire(TagBehaviors.QUIT, new QuitTagContext(world, player));
     }
 }
