@@ -58,7 +58,7 @@ public class BukkitHelixTag implements HelixTag {
                 var res = selectAll.executeQuery();
 
                 while (res.next()) {
-                    var uuid = new UUID(res.getLong("id_least"), res.getLong("id_most"));
+                    var uuid = new UUID(res.getLong("id_most"), res.getLong("id_least"));
 
                     var arr = res.getBlob("data").getBinaryStream();
 
