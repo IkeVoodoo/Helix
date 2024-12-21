@@ -20,17 +20,14 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class BukkitHelixTag implements HelixTag {
 
     private final PreparedStatement addStatement;
+    private final PreparedStatement editStatement;
     private final PreparedStatement removeStatement;
     private final PreparedStatement clearStatement;
 
@@ -69,6 +66,7 @@ public class BukkitHelixTag implements HelixTag {
             }
 
             this.addStatement = connection.prepareStatement("INSERT INTO ids (id_least, id_most, data) VALUES (?, ?, ?)");
+            this.editStatement = connection.prepareStatement("UPDATE ids SET id_least = ?, id_most = ?, data = ? WHERE id_least = ? AND id_most = ?");
             this.removeStatement = connection.prepareStatement("DELETE FROM ids WHERE id_least = ? AND id_most = ?");
             this.clearStatement = connection.prepareStatement("DELETE FROM ids");
         } catch (SQLException | IOException e) {
@@ -197,11 +195,33 @@ public class BukkitHelixTag implements HelixTag {
 
         consumer.accept(storage);
 
-        if (storage.isEdited()) {
-            this.save(uuid);
-        }
-
         storage.freeze();
+
+        if (storage.isEdited()) {
+            this.edit(uuid);
+        }
+    }
+
+    private void edit(UUID uuid) {
+        Helix.scheduler().async(() -> {
+            try {
+                this.editStatement.setLong(1, uuid.getLeastSignificantBits());
+                this.editStatement.setLong(2, uuid.getMostSignificantBits());
+                this.editStatement.setLong(4, uuid.getLeastSignificantBits());
+                this.editStatement.setLong(5, uuid.getMostSignificantBits());
+
+                var baos = new ByteArrayOutputStream();
+                var entry = this.entries.get(uuid);
+                entry.toBytes(baos);
+
+                var bain = new ByteArrayInputStream(baos.toByteArray());
+
+                this.editStatement.setBlob(3, bain);
+                this.editStatement.executeUpdate();
+            } catch (SQLException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private void save(UUID uuid) {
